@@ -43,8 +43,6 @@ client.on('message', msg => {
   const cursorItem = items.find(item => item.name.trim().toLowerCase().includes((itemName)));
   if (!cursorItem) return msg.reply('Item not found 😢');
 
-  console.log(cursorItem);
-
   // build reply string
   const headerString = `\n**${amount}X ${cursorItem.name.toUpperCase()}**\nIngredients:\n`;
   let ingredientString = '';
@@ -53,7 +51,7 @@ client.on('message', msg => {
   }
   const sourceString = `*Source: https://lastoasiscrafter.com*`;
 
-  return msg.reply(headerString + ingredientString + sourceString)
+  return msg.channel.send(headerString + ingredientString + sourceString)
 });
 
 const token = require('./discordToken');
