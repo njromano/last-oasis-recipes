@@ -5,10 +5,10 @@ Last Oasis Recipes is a Discord bot that can reads item data from [lastoasis-cra
 # Usage
 Invite the bot using the link below, then list an item's crafting ingredients by typing `!craft [command]`.
 
-## List ingredients for a single item
+List ingredients for a single item
 `!craft Item Name`
 
-## List ingredients for multiples of the same item
+List ingredients for multiples of the same item
 `!craft 100x Item Name`
 
 [Add the bot to your Discord!](https://discord.com/api/oauth2/authorize?client_id=784639975689814016&permissions=2048&scope=bot)
