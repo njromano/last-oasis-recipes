@@ -5,7 +5,6 @@ const https = require('https');
 const itemUrl = 'https://raw.githubusercontent.com/Last-Oasis-Crafter/lastoasis-crafting-calculator/master/src/items.json';
 let items = [];
 
-
 client.on('ready', () => {
   https.get(itemUrl, (res) => {
     let body = "";
@@ -25,26 +24,36 @@ client.on('ready', () => {
   })
 });
 
+// [999x] <Item Name>
+const commandRegex = new RegExp(/(?:([0-9]+)x\s)?((?:\w\s?)+)/);
+
 client.on('message', msg => {
-  if (msg.content.startsWith('!craft')) {
-    const itemName = msg.content.replace('!craft', '').trim().toLowerCase();
-    if (!itemName) return msg.reply('Invalid syntax, use `!craft <item>`')
-    // find item
-    const cursorItem = items.find(item => item.name.trim().toLowerCase().includes((itemName)));
-    if (!cursorItem) return msg.reply('Item not found 😢');
+  if (!msg.content.startsWith('!craft')) return;
 
-    console.log(cursorItem);
+  const commandText = msg.content.replace('!craft', '').trim().toLowerCase();
+  const groups = commandText.match(commandRegex);
+  if (groups == null) return msg.reply('Invalid syntax, use `!craft <amount>x <item>`');
 
-    // build reply string
-    const headerString = `\n**${cursorItem.name.toUpperCase()}**\nIngredients:\n`;
-    let ingredientString = '';
-    for (let ingredient of cursorItem.crafting[0].ingredients) {
-      ingredientString += `> ${ingredient.count}x ${ingredient.name}\n`
-    }
-    const sourceString = `*Source: https://lastoasiscrafter.com*`;
+  // first regex group is optional amount
+  const amount = groups[1] || 1;
+  // second regex group is item name
+  const itemName = groups[2].toLowerCase().trim();
 
-    return msg.reply(headerString + ingredientString + sourceString)
+  // find item
+  const cursorItem = items.find(item => item.name.trim().toLowerCase().includes((itemName)));
+  if (!cursorItem) return msg.reply('Item not found 😢');
+
+  console.log(cursorItem);
+
+  // build reply string
+  const headerString = `\n**${amount}X ${cursorItem.name.toUpperCase()}**\nIngredients:\n`;
+  let ingredientString = '';
+  for (let ingredient of cursorItem.crafting[0].ingredients) {
+    ingredientString += `> ${ingredient.count * amount}x ${ingredient.name}\n`
   }
+  const sourceString = `*Source: https://lastoasiscrafter.com*`;
+
+  return msg.reply(headerString + ingredientString + sourceString)
 });
 
 const token = require('./discordToken');
