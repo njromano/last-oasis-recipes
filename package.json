@@ -1,0 +1,22 @@
+{
+  "name": "last-oasis-recipes",
+  "version": "1.0.0",
+  "description": "Last Oasis Recipes is a Discord bot that can reads item data from [lastoasis-crafting-calculator](https://raw.githubusercontent.com/Last-Oasis-Crafter/lastoasis-crafting-calculator/master/src/items.json). Users in connected Discords can ask for an item's recipe for by searching its name.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/njromano/last-oasis-recipes.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/njromano/last-oasis-recipes/issues"
+  },
+  "homepage": "https://github.com/njromano/last-oasis-recipes#readme",
+  "dependencies": {
+    "discord.js": "^12.5.1"
+  }
+}
