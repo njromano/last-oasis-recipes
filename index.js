@@ -25,10 +25,10 @@ client.on('ready', () => {
 });
 
 // [999x] <Item Name>
-const commandRegex = new RegExp(/(?:([0-9]+)x\s)?((?:\w\s?)+)/);
+const commandRegex = new RegExp(/(?:([0-9]+)x\s)?(.+)/);
 
 client.on('message', msg => {
-  if (!msg.content.startsWith('!craft')) return;
+  if (!msg.content.toLowerCase().startsWith('!craft')) return;
 
   const commandText = msg.content.replace('!craft', '').trim().toLowerCase();
   const groups = commandText.match(commandRegex);
