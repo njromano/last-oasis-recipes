@@ -39,9 +39,20 @@ client.on('message', msg => {
   // second regex group is item name
   const itemName = groups[2].toLowerCase().trim();
 
-  // find item
-  const cursorItem = items.find(item => item.name.trim().toLowerCase().includes((itemName)));
-  if (!cursorItem) return msg.reply('Item not found 😢');
+  // find items which match name
+  // if multiple, return list of matches without ingredients
+  const matchingItems = items.filter(item => item.name.trim().toLowerCase().includes(itemName));
+  if (matchingItems.length === 0) return msg.reply('Item not found 😢');
+  if (matchingItems.length > 1) {
+    let itemString = '';
+    for (let item of matchingItems) {
+      itemString += `> ${item.name}\n`;
+    }
+    return msg.channel.send(`Multiple matching items for "${itemName}"\n${itemString}`)
+  }
+
+  // only one item matched, so print recipe
+  const cursorItem = matchingItems[0];
 
   // build reply string
   const headerString = `\n**${amount}X ${cursorItem.name.toUpperCase()}**\nIngredients:\n`;
