@@ -1,12 +1,12 @@
 const Discord = require('discord.js');
+const https = require('https');
 const client = new Discord.Client();
 
-const https = require('https');
-const itemUrl = 'https://raw.githubusercontent.com/Last-Oasis-Crafter/lastoasis-crafting-calculator/master/src/items.json';
+// load items from lastoasiscrafter.com repo
+const ITEM_DATA = 'https://raw.githubusercontent.com/Last-Oasis-Crafter/lastoasis-crafting-calculator/master/src/items.json';
 let items = [];
-
-client.on('ready', () => {
-  https.get(itemUrl, (res) => {
+client.on('ready', async () => {
+  https.get(ITEM_DATA, (res) => {
     let body = "";
     res.on('data', (chunk) => {
       body += chunk;
@@ -24,31 +24,31 @@ client.on('ready', () => {
   })
 });
 
-// [999x] <Item Name>
+// REGEX for [999x] <Item Name>
 const commandRegex = new RegExp(/(?:([0-9]+)x\s)?(.+)/);
+const normalize = (inputString) => inputString.toLowerCase().trim();
 
 client.on('message', async msg => {
-  if (!msg.content.toLowerCase().startsWith('!craft')) return;
-
-  const commandText = msg.content.replace('!craft', '').trim().toLowerCase();
-
+  if (!normalize(msg.content).startsWith('!craft')) return;
+  const commandText = normalize(msg.content.replace('!craft', ''));
   const commandSplit = commandText.split(', ');
 
   let totalIngredients = [];
-
   for (let cmd of commandSplit) {
-    console.log(commandSplit);
     const groups = cmd.match(commandRegex);
-    if (groups == null) return msg.reply('Invalid syntax, use `!craft <amount>x <item>, <amount>x <item>...`');
+    if (groups == null) return msg.reply('Invalid syntax, use `!craft help` or `!craft <amount>x <item>, <amount>x <item>...`');
+
+    if (groups[2] === 'help')
+      return msg.channel.send('Usage: `!craft <amount>x <item>, <amount>x <item>...`');
 
     // first regex group is optional amount
     const amount = groups[1] || 1;
     // second regex group is item name
-    const itemName = groups[2].toLowerCase().trim();
+    const itemName = normalize(groups[2]);
 
     // find items which match name
     // if multiple, return list of matches without ingredients
-    const matchingItems = items.filter(item => item.name.trim().toLowerCase().includes(itemName));
+    const matchingItems = items.filter(item => normalize(item.name).includes(itemName));
     if (matchingItems.length === 0) return msg.reply('Item not found 😢');
     if (matchingItems.length > 1) {
       let itemString = '';
@@ -61,11 +61,9 @@ client.on('message', async msg => {
 
     // only one item matched, so print recipe
     const cursorItem = matchingItems[0];
-
     // build reply string
     const headerString = `\n**${amount}X ${cursorItem.name.toUpperCase()}**\nIngredients:\n`;
     let ingredientString = '';
-
     for (let ingredient of cursorItem.crafting[0].ingredients) {
 
       // add to total ingredients
@@ -75,7 +73,6 @@ client.on('message', async msg => {
       } else {
         totalIngredients.push({ name: ingredient.name, count: ingredient.count * amount});
       }
-
       ingredientString += `> ${ingredient.count * amount}x ${ingredient.name}\n`
     }
     await msg.channel.send(headerString + ingredientString)
