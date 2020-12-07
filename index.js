@@ -34,6 +34,8 @@ client.on('message', async msg => {
 
   const commandSplit = commandText.split(', ');
 
+  let totalIngredients = [];
+
   for (let cmd of commandSplit) {
     console.log(commandSplit);
     const groups = cmd.match(commandRegex);
@@ -63,11 +65,28 @@ client.on('message', async msg => {
     // build reply string
     const headerString = `\n**${amount}X ${cursorItem.name.toUpperCase()}**\nIngredients:\n`;
     let ingredientString = '';
+
     for (let ingredient of cursorItem.crafting[0].ingredients) {
+
+      // add to total ingredients
+      const ingredientInTotal = totalIngredients.find(i => i.name === ingredient.name);
+      if (ingredientInTotal) {
+        ingredientInTotal.count += ingredient.count * amount;
+      } else {
+        totalIngredients.push({ name: ingredient.name, count: ingredient.count * amount});
+      }
+
       ingredientString += `> ${ingredient.count * amount}x ${ingredient.name}\n`
     }
     await msg.channel.send(headerString + ingredientString)
   }
+
+  if (commandSplit.length < 2) return;
+  let totalIngredientString = '';
+  for (let totalIngredient of totalIngredients) {
+    totalIngredientString += `> ${totalIngredient.count}x ${totalIngredient.name}\n`
+  }
+  await msg.channel.send(`\n**TOTAL**\n${totalIngredientString}`);
 });
 
 const token = require('./discordToken');
