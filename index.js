@@ -27,42 +27,47 @@ client.on('ready', () => {
 // [999x] <Item Name>
 const commandRegex = new RegExp(/(?:([0-9]+)x\s)?(.+)/);
 
-client.on('message', msg => {
+client.on('message', async msg => {
   if (!msg.content.toLowerCase().startsWith('!craft')) return;
 
   const commandText = msg.content.replace('!craft', '').trim().toLowerCase();
-  const groups = commandText.match(commandRegex);
-  if (groups == null) return msg.reply('Invalid syntax, use `!craft <amount>x <item>`');
 
-  // first regex group is optional amount
-  const amount = groups[1] || 1;
-  // second regex group is item name
-  const itemName = groups[2].toLowerCase().trim();
+  const commandSplit = commandText.split(', ');
 
-  // find items which match name
-  // if multiple, return list of matches without ingredients
-  const matchingItems = items.filter(item => item.name.trim().toLowerCase().includes(itemName));
-  if (matchingItems.length === 0) return msg.reply('Item not found 😢');
-  if (matchingItems.length > 1) {
-    let itemString = '';
-    for (let item of matchingItems) {
-      itemString += `> ${item.name}\n`;
+  for (let cmd of commandSplit) {
+    console.log(commandSplit);
+    const groups = cmd.match(commandRegex);
+    if (groups == null) return msg.reply('Invalid syntax, use `!craft <amount>x <item>, <amount>x <item>...`');
+
+    // first regex group is optional amount
+    const amount = groups[1] || 1;
+    // second regex group is item name
+    const itemName = groups[2].toLowerCase().trim();
+
+    // find items which match name
+    // if multiple, return list of matches without ingredients
+    const matchingItems = items.filter(item => item.name.trim().toLowerCase().includes(itemName));
+    if (matchingItems.length === 0) return msg.reply('Item not found 😢');
+    if (matchingItems.length > 1) {
+      let itemString = '';
+      for (let item of matchingItems) {
+        itemString += `> ${item.name}\n`;
+      }
+      await msg.channel.send(`Multiple matching items for "${itemName}"\n${itemString}`)
+      continue;
     }
-    return msg.channel.send(`Multiple matching items for "${itemName}"\n${itemString}`)
+
+    // only one item matched, so print recipe
+    const cursorItem = matchingItems[0];
+
+    // build reply string
+    const headerString = `\n**${amount}X ${cursorItem.name.toUpperCase()}**\nIngredients:\n`;
+    let ingredientString = '';
+    for (let ingredient of cursorItem.crafting[0].ingredients) {
+      ingredientString += `> ${ingredient.count * amount}x ${ingredient.name}\n`
+    }
+    await msg.channel.send(headerString + ingredientString)
   }
-
-  // only one item matched, so print recipe
-  const cursorItem = matchingItems[0];
-
-  // build reply string
-  const headerString = `\n**${amount}X ${cursorItem.name.toUpperCase()}**\nIngredients:\n`;
-  let ingredientString = '';
-  for (let ingredient of cursorItem.crafting[0].ingredients) {
-    ingredientString += `> ${ingredient.count * amount}x ${ingredient.name}\n`
-  }
-  const sourceString = `*Source: https://lastoasiscrafter.com*`;
-
-  return msg.channel.send(headerString + ingredientString + sourceString)
 });
 
 const token = require('./discordToken');
