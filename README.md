@@ -11,5 +11,8 @@ List ingredients for a single item
 List ingredients for multiples of the same item
 `!craft 100x Item Name`
 
+List ingredients for multiple items with total
+`!craft 100x Item 1, 2x Item 2, 50x Item 3`
+
 [Add the bot to your Discord!](https://discord.com/api/oauth2/authorize?client_id=784639975689814016&permissions=2048&scope=bot)
 
