@@ -22,6 +22,10 @@ client.on('ready', async () => {
   }).on('error', (error) => {
     console.error(error.message);
   })
+  console.log('Guilds: ');
+  for (let g of client.guilds.cache) {
+    console.log(g[1].name);
+  }
 });
 
 // REGEX for [999x] <Item Name>
