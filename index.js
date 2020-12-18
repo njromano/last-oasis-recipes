@@ -42,8 +42,10 @@ client.on('message', async msg => {
     const groups = cmd.match(commandRegex);
     if (groups == null) return msg.reply('Invalid syntax, use `!craft help` or `!craft <amount>x <item>, <amount>x <item>...`');
 
-    if (groups[2] === 'help')
+    if (groups[2] === 'help') {
+      await msg.channel.send('Help with hosting fees and buy me a coffee! https://buymeacoffee.com/nromano\n');
       return msg.channel.send('Usage: `!craft <amount>x <item>, <amount>x <item>...`');
+    }
 
     // first regex group is optional amount
     const amount = groups[1] || 1;
